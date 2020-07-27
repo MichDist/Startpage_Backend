@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Startpage_Backend.Models;
+using Startpage_Backend.Services;
 
 namespace Startpage_Backend
 {
@@ -25,7 +28,18 @@ namespace Startpage_Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.Configure<StartpageDatabaseSettings>(
+                Configuration.GetSection(nameof(StartpageDatabaseSettings)));
+
+            
+            services.AddSingleton<IStartpageDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<StartpageDatabaseSettings>>().Value);
+
+            services.AddSingleton<WebsiteService>();
+
+            services.AddControllers()
+                .AddNewtonsoftJson(options => options.UseMemberCasing());
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
