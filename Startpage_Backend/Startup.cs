@@ -18,6 +18,8 @@ namespace Startpage_Backend
 {
     public class Startup
     {
+        readonly string AllowSpecificOrigins = "_allowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -37,6 +39,13 @@ namespace Startpage_Backend
 
             services.AddSingleton<WebsiteService>();
 
+            services.AddCors(options =>
+                options.AddPolicy(name: AllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000");
+                    }));
+
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
 
@@ -53,6 +62,8 @@ namespace Startpage_Backend
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(AllowSpecificOrigins);
 
             app.UseAuthorization();
 
